@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" const="text/html;charset=UTF-8" />
+  <link rel="stylesheet" type="text/css" href="../public/style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+  <script src="https://cdn.socket.io/4.5.0/socket.io.min.js" integrity="sha384-7EyYLQZgWBi67fBtVxw60/OWl1kjsfrPFcaU0pp0nAh+i8FD068QogUvg85Ewy1k" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <!-- <script src="../public/chat.js"></script> -->
+  <title>Simple Chat App</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font: 13px;
+    }
+
+    form {
+      /* background: #; */
+      padding: 3px;
+      position: fixed;
+      bottom: 5%;
+      width: 100%;
+    }
+
+    form input {
+      border: 0;
+      padding: 10px;
+      width: 70%;
+      margin-right: .5%;
+    }
+
+    form #button {
+      color: #fff;
+      background-color: #2d9f0b;
+      border: none;
+      padding: 10px;
+      width: 9%;
+    }
+
+    #message {
+      list-style-type: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    #message li {
+      padding: 5px 10px;
+    }
+
+    #message li:nth-child(odd) {
+      background: #eee;
+    }
+
+    #notifyUser {
+      position: fixed;
+      bottom: 42px;
+      width: 100%;
+    }
+    .bodi{
+      width: 70%;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="bodi">
+    <ul id="message"></ul>
+    <span id="notifyUser"></span>
+    <form action="" id="form" onsubmit="return submitFunction();" class="">
+      <input type="hidden" id="user" value="">
+      <input type="text" id="m" placeholder="Text Here ..." autocomplete="off">
+      <button type="submit" id="submit" class="btn" style="  color: #fff;background-color: #2d9f0b;border: none;padding: 10px;width: 9%;">send</button>
+    </form>
+  </div>
+
+  <script>
+    const socket = io();
+    let person = prompt("Please enter your name", "my parents hasnt chosen a name for me");
+    if (person === "my parents hasnt chosen a name for me") {
+      person = prompt("Please enter your name", 'realy i dont belive that');
+    }
+    if (person === 'realy i dont belive that') {
+      person = prompt("Please enter your name", 'ok i am  lamp');
+    }
+    if (person === null) {
+      person = "i am big lamp";
+    }
+
+    function submitFunction() {
+      const from = $("#user").val();
+      const message = $("#m").val();
+
+      if (message != "") {
+        socket.emit("chatMessage", from, message);
+      }
+      $("#m").val("").focus();
+
+      return false;
+    }
+
+    socket.on("chatMessage", (from, msg) => {
+      let me = $("#user").val();
+      let color = (from == me) ? "green" : "red";
+      let align = (from == me) ? "right" : "left";
+      let fro = (from == me) ? "Me" : from;
+
+      $("#message").append(
+        "<li style='text-align:" + align + "'><b style='color:" + color + `;text-align:${align}` + "'>" + fro + "</b>:" + msg + "</li>"
+      );
+    });
+
+    $(document).ready(function() {
+      let name = person;
+      $("#user").val(name);
+      socket.emit("chatMessage", "SYS", "<b>" + name + "</b> has joined");
+    });
+
+    // function makeId() {
+    //   let text = "";
+    //   let char = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqurstuvwxyz123456789";
+    //   for (let index = 0; index < 6; index++) {
+    //     text += char.charAt(Math.floor(Math.random() * char.length))
+    //   }
+    //   return text;
+    // }
+  </script>
+</body>
+
+</html>
